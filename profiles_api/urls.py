@@ -4,6 +4,7 @@ from . import views
 
 router = DefaultRouter()
 router.register(r'hello-viewset', views.HelloViewSet, basename='hello-viewset')
+router.register(r'profiles', views.UserProfileViewSet, basename='profiles')
 
 urlpatterns = [
     re_path(r'^hello-view/([0-9]{2})/$', views.HelloApiView.as_view()),

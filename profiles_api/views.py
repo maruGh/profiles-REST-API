@@ -1,9 +1,19 @@
 from rest_framework.response import Response
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.views import APIView
-from rest_framework.viewsets import ViewSet
-from rest_framework import status
-from .serializers import HelloSerializer
+from rest_framework.viewsets import ViewSet, ModelViewSet
+from .serializers import HelloSerializer, UserProfileSerializer
 from .models import User
+from .permissions import UpdateOwnProfile
+
+
+class UserProfileViewSet(ModelViewSet):
+    """Handle creating and updating profiles"""
+    serializer_class = UserProfileSerializer
+    queryset = User.objects.all().order_by('-date_joined')
+
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [UpdateOwnProfile]
 
 
 class HelloApiView(APIView):
