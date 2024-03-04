@@ -1,5 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.filters import SearchFilter
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet, ModelViewSet
 from .serializers import HelloSerializer, UserProfileSerializer
@@ -13,7 +14,10 @@ class UserProfileViewSet(ModelViewSet):
     queryset = User.objects.all().order_by('-date_joined')
 
     authentication_classes = [TokenAuthentication]
+    filter_backends = [SearchFilter]
     permission_classes = [UpdateOwnProfile]
+
+    search_fields = ['email', 'first_name', 'last_name']
 
 
 class HelloApiView(APIView):
