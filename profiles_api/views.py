@@ -1,15 +1,18 @@
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.settings import api_settings
 from rest_framework.filters import SearchFilter
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet, ModelViewSet
+from rest_framework.permissions import IsAdminUser
 from .serializers import HelloSerializer, UserProfileSerializer
 from .models import User
 from .permissions import UpdateOwnProfile
 
 
 class UserProfileViewSet(ModelViewSet):
-    """Handle creating and updating profiles"""
+    """ Handle creating and updating profiles """
     serializer_class = UserProfileSerializer
     queryset = User.objects.all().order_by('-date_joined')
 
@@ -18,6 +21,11 @@ class UserProfileViewSet(ModelViewSet):
     permission_classes = [UpdateOwnProfile]
 
     search_fields = ['email', 'first_name', 'last_name']
+
+
+class UserLoginApiView(ObtainAuthToken):
+    """Handle creating user authentication tokens"""
+    renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
 
 
 class HelloApiView(APIView):
