@@ -5,10 +5,15 @@ from rest_framework.settings import api_settings
 from rest_framework.filters import SearchFilter
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet, ModelViewSet
-from rest_framework.permissions import IsAdminUser
-from .serializers import HelloSerializer, UserProfileSerializer
-from .models import User
-from .permissions import UpdateOwnProfile
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, SAFE_METHODS, IsAuthenticatedOrReadOnly
+from .serializers import HelloSerializer, UserProfileSerializer, FeedItemSerializer
+from .models import User, FeedItem
+from .permissions import UpdateOwnProfile, UpdateOwnFeedItem
+
+
+class UserLoginApiView(ObtainAuthToken):
+    """Handle creating user authentication tokens"""
+    renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
 
 
 class UserProfileViewSet(ModelViewSet):
@@ -19,13 +24,20 @@ class UserProfileViewSet(ModelViewSet):
     authentication_classes = [TokenAuthentication]
     filter_backends = [SearchFilter]
     permission_classes = [UpdateOwnProfile]
-
     search_fields = ['email', 'first_name', 'last_name']
 
 
-class UserLoginApiView(ObtainAuthToken):
-    """Handle creating user authentication tokens"""
-    renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
+class FeedItemViewSet(ModelViewSet):
+    """Handle creating and updating profiles """
+    serializer_class = FeedItemSerializer
+    authentication_classes = [TokenAuthentication]
+    queryset = FeedItem.objects.all()
+
+    permission_classes = [UpdateOwnFeedItem, IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        """Sets the user profile to the logged in user"""
+        serializer.save(user_profile=self.request.user)
 
 
 class HelloApiView(APIView):

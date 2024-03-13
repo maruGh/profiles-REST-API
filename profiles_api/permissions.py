@@ -9,3 +9,13 @@ class UpdateOwnProfile(BasePermission):
         if request.method in SAFE_METHODS:
             return True
         return obj.id == request.user.id or request.user.is_staff
+
+
+class UpdateOwnFeedItem(BasePermission):
+    """Allow users to edit their own profiles"""
+
+    def has_object_permission(self, request, view, obj):
+        """Check if the user is the owner"""
+        if request.method in SAFE_METHODS:
+            return True
+        return obj.user_profile.id == request.user.id or request.user.is_staff
